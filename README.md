@@ -21,6 +21,10 @@ to execute the migration process.
 
 ## Example queries
 
+This is the final strucure created for Sparkify:
+
+![Data Model](docs/data_model.png)
+
 Now we can know what song a user listen, where they are and when they listen the song. We can get details of song like artist, duration etc.
 
 On example below we get the informations about users that listen a song in our library, where they are, what song they listen and the date they do it.
