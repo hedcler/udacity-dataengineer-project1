@@ -6,11 +6,33 @@ from sql_queries import *
 
 
 def process_song_file(cur, filepath):
+    '''
+    This procedure process songs files, reading, transforming 
+    and inserting on database.
+
+    It extracts the artist and song information in order to store 
+    it into the artists and the songs tables.
+
+    Parameters
+    ----------
+    cur : psycopg2.connection.cursor
+        The database connection cursor for execute insertion queries
+    
+    filepath : string
+        The string of songs file path
+    '''
+
     # open song file
     df = pd.read_json(filepath, typ='series')
     
     # insert artist record
-    artist_data = df[['artist_id', 'artist_name', 'artist_location', 'artist_latitude', 'artist_longitude']].values.tolist()
+    artist_data = df[[
+        'artist_id', 
+        'artist_name', 
+        'artist_location', 
+        'artist_latitude', 
+        'artist_longitude'
+    ]].values.tolist()
     cur.execute(artist_table_insert, artist_data)
 
     # insert song record
@@ -19,6 +41,22 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
+    '''
+    This procedure process logs files, reading, transforming 
+    and inserting on database.
+    
+    It extracts the date, user and songplay information in order 
+    to store it into the time, users and songplayes tables. 
+
+    Parameters
+    ----------
+    cur : psycopg2.connection.cursor
+        The database connection cursor for execute insertion queries
+    
+    filepath : string
+        The string of logs file path
+    '''
+
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -79,6 +117,27 @@ def process_log_file(cur, filepath):
 
 
 def process_data(cur, conn, filepath, func):
+    '''
+    This procedure read and execute a process for all kinds file 
+    inside path. To do it, the procedure executing a specific 
+    function to process a specific kind of file. These files can be
+    `songs` or  `logs` file.
+
+    Parameters
+    ----------
+    cur : psycopg2.connection.cursor
+        The database connection cursor
+
+    conn : psycopg2.connection
+        The database connection
+    
+    filepath : string
+        The string of path containing a kind of files
+    
+    func : function
+        The function called to process files in a specific path
+    '''
+
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
@@ -99,6 +158,11 @@ def process_data(cur, conn, filepath, func):
     print('data process finished.')
 
 def main():
+    '''
+    This is the main procedure. The start point of the ETL process.
+    Here the connection to the database is opened, the file paths are defined
+    and the execution starts.
+    '''
     conn = psycopg2.connect("host=postgres dbname=sparkifydb user=postgres password=example")
     conn.set_session(autocommit=True)
     cur = conn.cursor()
